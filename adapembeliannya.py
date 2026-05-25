@@ -6,7 +6,7 @@ import random
 # CONFIG PAGE
 # ======================================
 st.set_page_config(
-    page_title="Access By Train",
+    page_title="Stasiun VY Junction",
     page_icon="🚆",
     layout="wide"
 )
