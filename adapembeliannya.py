@@ -1,5 +1,4 @@
-import heapq
-import random
+import streamlit as st
 
 # ======================================
 # CLASS LOGIN
@@ -398,7 +397,7 @@ class GraphKereta:
 
         print(f"🕒 Jadwal        : {jadwal_terpilih}")
 
-        print(f"🎟️ Jumlah Tiket : {jumlah}")
+        print(f"🎟️ Jumlah Tiket  : {jumlah}")
 
         print(f"📍 Total Jarak   : {total_jarak} KM")
 
@@ -556,6 +555,11 @@ def main():
 
             print("\n❌ Menu tidak tersedia!")
 
+
+# ======================================
+# MENJALANKAN PROGRAM
+# ======================================
+main()
 
 # ======================================
 # MENJALANKAN PROGRAM
