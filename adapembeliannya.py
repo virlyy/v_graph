@@ -2,69 +2,11 @@ import streamlit as st
 import heapq
 import random
 
-# ======================================
-# CONFIG PAGE
-# ======================================
 st.set_page_config(
     page_title="Stasiun VY Junction",
     page_icon="🚆",
     layout="wide"
 )
-
-# ======================================
-# BACKGROUND IMAGE
-# ======================================
-page_bg = """
-<style>
-
-[data-testid="stAppViewContainer"]{
-background-image: url("https://images.unsplash.com/photo-1514565131-fce0801e5785");
-background-size: cover;
-background-position: center;
-background-repeat: no-repeat;
-background-attachment: fixed;
-}
-
-[data-testid="stHeader"]{
-background: rgba(0,0,0,0);
-}
-
-[data-testid="stSidebar"]{
-background: rgba(0,0,0,0.7);
-}
-
-h1, h2, h3, h4, h5, h6, p, label, div{
-color: white !important;
-}
-
-.stButton>button{
-background-color: #ff4b4b;
-color: white;
-border-radius: 10px;
-height: 45px;
-width: 100%;
-font-size: 18px;
-}
-
-.stTextInput>div>div>input{
-background-color: rgba(255,255,255,0.2);
-color: white;
-}
-
-.stSelectbox>div>div{
-background-color: rgba(255,255,255,0.2);
-color: white;
-}
-
-.stNumberInput>div>div>input{
-background-color: rgba(255,255,255,0.2);
-color: white;
-}
-
-</style>
-"""
-
-st.markdown(page_bg, unsafe_allow_html=True)
 
 # ======================================
 # CLASS LOGIN
@@ -114,18 +56,25 @@ class GraphKereta:
             "Jakarta": [
                 ("Bandung", 150),
                 ("Bekasi", 35),
-                ("Bogor", 60)
+                ("Bogor", 60),
+                ("Cirebon", 220)
             ],
 
-            "Bandung": [
-                ("Jakarta", 150),
-                ("Yogyakarta", 390),
-                ("Garut", 70)
+            "Bekasi": [
+                ("Jakarta", 35),
+                ("Karawang", 45),
+                ("Depok", 30)
+            ],
+
+            "Depok": [
+                ("Bekasi", 30),
+                ("Bogor", 40)
             ],
 
             "Bogor": [
                 ("Jakarta", 60),
-                ("Sukabumi", 90)
+                ("Sukabumi", 90),
+                ("Depok", 40)
             ],
 
             "Sukabumi": [
@@ -133,9 +82,31 @@ class GraphKereta:
                 ("Bandung", 100)
             ],
 
-            "Bekasi": [
-                ("Jakarta", 35),
-                ("Karawang", 45)
+            "Bandung": [
+                ("Jakarta", 150),
+                ("Tasikmalaya", 110),
+                ("Garut", 70),
+                ("Cimahi", 20),
+                ("Yogyakarta", 390)
+            ],
+
+            "Cimahi": [
+                ("Bandung", 20)
+            ],
+
+            "Garut": [
+                ("Bandung", 70),
+                ("Tasikmalaya", 60)
+            ],
+
+            "Tasikmalaya": [
+                ("Bandung", 110),
+                ("Banjar", 80)
+            ],
+
+            "Banjar": [
+                ("Tasikmalaya", 80),
+                ("Yogyakarta", 200)
             ],
 
             "Karawang": [
@@ -144,22 +115,25 @@ class GraphKereta:
             ],
 
             "Cirebon": [
+                ("Jakarta", 220),
                 ("Karawang", 140),
+                ("Purwokerto", 170),
                 ("Semarang", 250)
+            ],
+
+            "Purwokerto": [
+                ("Cirebon", 170),
+                ("Yogyakarta", 180)
             ],
 
             "Semarang": [
                 ("Cirebon", 250),
+                ("Solo", 110),
                 ("Surabaya", 350)
             ],
 
-            "Yogyakarta": [
-                ("Bandung", 390),
-                ("Solo", 65),
-                ("Surabaya", 320)
-            ],
-
             "Solo": [
+                ("Semarang", 110),
                 ("Yogyakarta", 65),
                 ("Madiun", 100)
             ],
@@ -174,24 +148,38 @@ class GraphKereta:
                 ("Malang", 130)
             ],
 
-            "Malang": [
-                ("Kediri", 130),
-                ("Surabaya", 95)
+            "Yogyakarta": [
+                ("Bandung", 390),
+                ("Solo", 65),
+                ("Purwokerto", 180),
+                ("Banjar", 200),
+                ("Surabaya", 320)
             ],
 
             "Surabaya": [
                 ("Semarang", 350),
                 ("Yogyakarta", 320),
-                ("Malang", 95)
+                ("Malang", 95),
+                ("Jember", 200)
             ],
 
-            "Garut": [
-                ("Bandung", 70)
+            "Malang": [
+                ("Surabaya", 95),
+                ("Kediri", 130)
+            ],
+
+            "Jember": [
+                ("Surabaya", 200),
+                ("Banyuwangi", 100)
+            ],
+
+            "Banyuwangi": [
+                ("Jember", 100)
             ]
         }
 
     # ======================================
-    # DIJKSTRA
+    # ALGORITMA DIJKSTRA
     # ======================================
     def dijkstra(self, mulai, tujuan):
 
@@ -212,6 +200,9 @@ class GraphKereta:
         while pq:
 
             jarak_sekarang, stasiun_sekarang = heapq.heappop(pq)
+
+            if stasiun_sekarang == tujuan:
+                break
 
             for tetangga, bobot in self.graf[stasiun_sekarang]:
 
@@ -244,14 +235,14 @@ class GraphKereta:
 # ======================================
 # SESSION STATE
 # ======================================
-if "login" not in st.session_state:
-    st.session_state.login = False
-
 if "wallet" not in st.session_state:
     st.session_state.wallet = EWallet()
 
 if "riwayat" not in st.session_state:
     st.session_state.riwayat = []
+
+if "login" not in st.session_state:
+    st.session_state.login = False
 
 sistem = GraphKereta()
 
@@ -260,7 +251,7 @@ sistem = GraphKereta()
 # ======================================
 if not st.session_state.login:
 
-    st.title("🚆 ACCESS BY TRAIN")
+    st.title("🚆 Access By Train")
 
     st.subheader("Login Pengguna")
 
@@ -268,7 +259,7 @@ if not st.session_state.login:
     no_hp = st.text_input("No HP")
     email = st.text_input("Email")
 
-    if st.button("LOGIN"):
+    if st.button("Login"):
 
         if nama and no_hp and email:
 
@@ -305,12 +296,13 @@ else:
             "Cek Saldo",
             "Top Up Saldo",
             "Daftar Stasiun",
+            "Graph Kereta",
             "Riwayat Tiket",
             "Logout"
         ]
     )
 
-    st.title("🚆 ACCESS BY TRAIN")
+    st.title("🚆 Access By Train")
 
     st.success(f"Selamat Datang, {user.nama}")
 
@@ -429,12 +421,12 @@ else:
 
                 st.success("✅ Pembayaran Berhasil!")
 
-                st.info(f"💰 Sisa Saldo : Rp{wallet.saldo}")
+                st.info(f"Sisa Saldo : Rp{wallet.saldo}")
 
                 st.code(f"""
-================================
-      ACCESS BY TRAIN
-================================
+==================================
+        ACCESS BY TRAIN
+==================================
 Kode Tiket : {kode_tiket}
 Nama       : {user.nama}
 Dari       : {mulai}
@@ -443,7 +435,7 @@ Kelas      : {kelas}
 Kursi      : {kursi}
 Jadwal     : {jadwal}
 Total      : Rp{total}
-================================
+==================================
                 """)
 
             else:
@@ -490,6 +482,21 @@ Total      : Rp{total}
         for stasiun in sistem.graf.keys():
 
             st.write(f"✅ {stasiun}")
+
+    # ======================================
+    # GRAPH KERETA
+    # ======================================
+    elif menu == "Graph Kereta":
+
+        st.subheader("🗺️ Graph Rute Kereta")
+
+        for stasiun in sistem.graf:
+
+            st.markdown(f"### 🚉 {stasiun}")
+
+            for tujuan, jarak in sistem.graf[stasiun]:
+
+                st.write(f"➡️ {tujuan} ({jarak} KM)")
 
     # ======================================
     # RIWAYAT TIKET
