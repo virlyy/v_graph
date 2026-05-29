@@ -1,4 +1,3 @@
-```python
 import streamlit as st
 import heapq
 import random
@@ -468,4 +467,3 @@ elif menu == "Riwayat Tiket":
 
             💵 Harga : Rp{data['harga']}
             """)
-```
