@@ -1,3 +1,4 @@
+```python id="b1nx92"
 import streamlit as st
 import heapq
 import random
@@ -398,19 +399,23 @@ elif menu == "Top Up Saldo":
 
     st.subheader("➕ Top Up Saldo")
 
-    jumlah = st.number_input(
-        "Masukkan Jumlah Top Up",
-        min_value=1000,
-        value=10000
+    topup = st.text_input(
+        "Masukkan Jumlah Top Up"
     )
 
     if st.button("Top Up"):
 
-        st.session_state.saldo += jumlah
+        if topup.isdigit():
 
-        st.success("✅ Top Up Berhasil!")
+            st.session_state.saldo += int(topup)
 
-        st.write(f"💰 Saldo Sekarang : Rp{st.session_state.saldo}")
+            st.success("✅ Top Up Berhasil!")
+
+            st.write(f"💰 Saldo Sekarang : Rp{st.session_state.saldo}")
+
+        else:
+
+            st.error("❌ Masukkan angka yang valid!")
 
 # ======================================
 # DAFTAR STASIUN
@@ -467,3 +472,4 @@ elif menu == "Riwayat Tiket":
 
             💵 Harga : Rp{data['harga']}
             """)
+```
