@@ -119,7 +119,7 @@ class GraphKereta:
         }
 
     # ==========================================
-    # DIJKSTRA
+    # ALGORITMA DIJKSTRA
     # ==========================================
     def dijkstra(self, mulai, tujuan):
 
@@ -204,11 +204,11 @@ if st.session_state.login == False:
 
     st.title("🚆 LOGIN STASIUN VY JUNCTION")
 
-    nama = st.text_input("Nama")
-    no_hp = st.text_input("No HP")
-    email = st.text_input("Email")
+    nama = st.text_input("👤 Nama")
+    no_hp = st.text_input("📱 No HP")
+    email = st.text_input("📧 Email")
 
-    if st.button("Login", type="primary"):
+    if st.button("🚪 Login"):
 
         if nama and no_hp and email:
 
@@ -230,29 +230,29 @@ else:
 
     st.title("🚆 STASIUN VY JUNCTION")
 
-    st.success(f"Selamat Datang, {st.session_state.nama}")
+    st.success(f"✅ Selamat Datang, {st.session_state.nama}")
 
     # ==========================================
     # SIDEBAR MENU
     # ==========================================
     menu = st.sidebar.selectbox(
-        "Pilih Menu",
+        "📋 Pilih Menu",
         [
-            "Lihat Rute",
-            "Beli Tiket",
-            "Cek Saldo",
-            "Top Up Saldo",
-            "Daftar Stasiun",
-            "Koneksi Stasiun",
-            "Riwayat Tiket",
-            "Logout"
+            "📍 Lihat Rute",
+            "🎫 Beli Tiket",
+            "💰 Cek Saldo",
+            "➕ Top Up Saldo",
+            "🚉 Daftar Stasiun",
+            "🔗 Koneksi Stasiun",
+            "📜 Riwayat Tiket",
+            "🚪 Logout"
         ]
     )
 
     # ==========================================
     # LIHAT RUTE
     # ==========================================
-    if menu == "Lihat Rute":
+    if menu == "📍 Lihat Rute":
 
         st.subheader("📍 Cek Rute Kereta")
 
@@ -261,25 +261,25 @@ else:
         with col1:
 
             mulai = st.selectbox(
-                "Stasiun Awal",
+                "🚉 Stasiun Awal",
                 list(kereta.graf.keys())
             )
 
         with col2:
 
             tujuan = st.selectbox(
-                "Stasiun Tujuan",
+                "🚉 Stasiun Tujuan",
                 list(kereta.graf.keys())
             )
 
-        if st.button("Lihat Rute"):
+        if st.button("🔍 Lihat Rute"):
 
             rute, total_jarak = kereta.dijkstra(
                 mulai,
                 tujuan
             )
 
-            st.success("Rute Ditemukan!")
+            st.success("✅ Rute Ditemukan!")
 
             st.info(f"""
 🚉 Dari : {mulai}
@@ -294,7 +294,7 @@ else:
     # ==========================================
     # BELI TIKET
     # ==========================================
-    elif menu == "Beli Tiket":
+    elif menu == "🎫 Beli Tiket":
 
         st.subheader("🎫 Pembelian Tiket")
 
@@ -303,39 +303,39 @@ else:
         with col1:
 
             mulai2 = st.selectbox(
-                "Stasiun Awal ",
+                "🚉 Stasiun Awal ",
                 list(kereta.graf.keys())
             )
 
         with col2:
 
             tujuan2 = st.selectbox(
-                "Stasiun Tujuan ",
+                "🚉 Stasiun Tujuan ",
                 list(kereta.graf.keys())
             )
 
         kelas = st.selectbox(
-            "Pilih Kelas",
+            "🎫 Pilih Kelas",
             ["Ekonomi", "Bisnis", "Eksekutif"]
         )
 
         jumlah = st.number_input(
-            "Jumlah Tiket",
+            "🎟️ Jumlah Tiket",
             min_value=1,
             value=1
         )
 
         jadwal = st.selectbox(
-            "Pilih Jadwal",
+            "🕒 Pilih Jadwal",
             ["08:00 WIB", "12:00 WIB", "18:00 WIB"]
         )
 
         kursi = st.text_input(
-            "Nomor Kursi",
+            "🪑 Nomor Kursi",
             value="A1"
         )
 
-        if st.button("Pesan Tiket", type="primary"):
+        if st.button("💳 Pesan Tiket"):
 
             rute, total_jarak = kereta.dijkstra(
                 mulai2,
@@ -376,14 +376,14 @@ else:
        ACCESS BY TRAIN 🚆
 ══════════════════════════════
 
-Kode Tiket : {kode}
-Nama       : {st.session_state.nama}
-Dari       : {mulai2}
-Tujuan     : {tujuan2}
-Kelas      : {kelas}
-Kursi      : {kursi}
-Jadwal     : {jadwal}
-Total      : Rp{total}
+🎟️ Kode Tiket : {kode}
+👤 Nama       : {st.session_state.nama}
+🚉 Dari       : {mulai2}
+🚉 Tujuan     : {tujuan2}
+🎫 Kelas      : {kelas}
+🪑 Kursi      : {kursi}
+🕒 Jadwal     : {jadwal}
+💵 Total      : Rp{total}
 
 ══════════════════════════════
 """)
@@ -401,40 +401,40 @@ Total      : Rp{total}
     # ==========================================
     # CEK SALDO
     # ==========================================
-    elif menu == "Cek Saldo":
+    elif menu == "💰 Cek Saldo":
 
         st.subheader("💰 E-Wallet")
 
         st.info(
-            f"Saldo Anda : Rp{st.session_state.wallet.saldo}"
+            f"💰 Saldo Anda : Rp{st.session_state.wallet.saldo}"
         )
 
     # ==========================================
     # TOP UP
     # ==========================================
-    elif menu == "Top Up Saldo":
+    elif menu == "➕ Top Up Saldo":
 
         st.subheader("➕ Top Up Saldo")
 
         topup = st.number_input(
-            "Masukkan Jumlah Top Up",
+            "💵 Masukkan Jumlah Top Up",
             min_value=0
         )
 
-        if st.button("Top Up"):
+        if st.button("✅ Top Up"):
 
             st.session_state.wallet.topup(topup)
 
             st.success("✅ Top Up Berhasil!")
 
             st.info(
-                f"Saldo Sekarang : Rp{st.session_state.wallet.saldo}"
+                f"💰 Saldo Sekarang : Rp{st.session_state.wallet.saldo}"
             )
 
     # ==========================================
     # DAFTAR STASIUN
     # ==========================================
-    elif menu == "Daftar Stasiun":
+    elif menu == "🚉 Daftar Stasiun":
 
         st.subheader("🚉 Daftar Stasiun")
 
@@ -445,12 +445,12 @@ Total      : Rp{total}
     # ==========================================
     # KONEKSI STASIUN
     # ==========================================
-    elif menu == "Koneksi Stasiun":
+    elif menu == "🔗 Koneksi Stasiun":
 
         st.subheader("🔗 Koneksi Stasiun")
 
         pilih = st.selectbox(
-            "Pilih Stasiun",
+            "🚉 Pilih Stasiun",
             list(kereta.graf.keys())
         )
 
@@ -463,34 +463,34 @@ Total      : Rp{total}
     # ==========================================
     # RIWAYAT
     # ==========================================
-    elif menu == "Riwayat Tiket":
+    elif menu == "📜 Riwayat Tiket":
 
         st.subheader("📜 Riwayat Pembelian")
 
         if len(st.session_state.riwayat) == 0:
 
-            st.warning("Belum ada pembelian tiket.")
+            st.warning("❌ Belum ada pembelian tiket.")
 
         else:
 
             for data in st.session_state.riwayat:
 
                 st.code(f"""
-Nama   : {data['nama']}
-Dari   : {data['asal']}
-Tujuan : {data['tujuan']}
-Kelas  : {data['kelas']}
-Harga  : Rp{data['harga']}
+👤 Nama   : {data['nama']}
+🚉 Dari   : {data['asal']}
+🚉 Tujuan : {data['tujuan']}
+🎫 Kelas  : {data['kelas']}
+💵 Harga  : Rp{data['harga']}
 """)
 
     # ==========================================
     # LOGOUT
     # ==========================================
-    elif menu == "Logout":
+    elif menu == "🚪 Logout":
 
-        st.warning("Anda akan logout dari sistem.")
+        st.warning("⚠️ Anda akan logout dari sistem.")
 
-        if st.button("Logout Sekarang"):
+        if st.button("🚪 Logout Sekarang"):
 
             st.session_state.login = False
             st.rerun()
