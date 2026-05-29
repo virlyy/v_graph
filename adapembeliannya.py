@@ -3,587 +3,455 @@ import heapq
 import random
 
 # ======================================
-# CLASS LOGIN
+# CONFIG
 # ======================================
-class Login:
-
-    def __init__(self, nama, no_hp, email):
-
-        self.nama = nama
-        self.no_hp = no_hp
-        self.email = email
-
-    def welcome(self):
-
-        print("\n==========================================")
-        print(f" SELAMAT DATANG DI STASIUN VY JUNCTION 🚆")
-        print(f" User : {self.nama}")
-        print("==========================================")
-
+st.set_page_config(
+    page_title="Stasiun VY Junction",
+    page_icon="🚆",
+    layout="wide"
+)
 
 # ======================================
-# CLASS E-WALLET
+# CUSTOM CSS
 # ======================================
-class EWallet:
+st.markdown("""
+<style>
 
-    def __init__(self):
+.main {
+    background-color: #0f172a;
+    color: white;
+}
 
-        self.saldo = 500000
+.stButton>button {
+    background-color: #2563eb;
+    color: white;
+    border-radius: 10px;
+    height: 3em;
+    width: 100%;
+    font-size: 16px;
+}
 
-    def cek_saldo(self):
+.stTextInput>div>div>input {
+    border-radius: 10px;
+}
 
-        print("\n========== E-WALLET ==========")
+.box {
+    padding: 20px;
+    border-radius: 15px;
+    background-color: #1e293b;
+    margin-bottom: 20px;
+}
 
-        print(f"💰 Saldo Anda : Rp{self.saldo}")
-
-    def topup(self):
-
-        jumlah = int(input("Masukkan Jumlah Top Up : Rp"))
-
-        self.saldo += jumlah
-
-        print("\n✅ Top Up Berhasil!")
-
-        print(f"💰 Saldo Sekarang : Rp{self.saldo}")
-
-    def bayar(self, total):
-
-        if self.saldo >= total:
-
-            self.saldo -= total
-
-            return True
-
-        else:
-
-            return False
-
+</style>
+""", unsafe_allow_html=True)
 
 # ======================================
-# CLASS GRAPH KERETA
+# SESSION STATE
 # ======================================
-class GraphKereta:
-
-    def __init__(self):
-
-        self.riwayat = []
-
-        self.graf = {
-
-            "Jakarta": [
-                ("Bandung", 150),
-                ("Bekasi", 35),
-                ("Bogor", 60),
-                ("Cirebon", 220)
-            ],
-
-            "Bekasi": [
-                ("Jakarta", 35),
-                ("Karawang", 45),
-                ("Depok", 30)
-            ],
-
-            "Depok": [
-                ("Bekasi", 30),
-                ("Bogor", 40)
-            ],
-
-            "Bogor": [
-                ("Jakarta", 60),
-                ("Sukabumi", 90),
-                ("Depok", 40)
-            ],
-
-            "Sukabumi": [
-                ("Bogor", 90),
-                ("Bandung", 100)
-            ],
-
-            "Bandung": [
-                ("Jakarta", 150),
-                ("Tasikmalaya", 110),
-                ("Garut", 70),
-                ("Cimahi", 20),
-                ("Yogyakarta", 390)
-            ],
-
-            "Cimahi": [
-                ("Bandung", 20)
-            ],
-
-            "Garut": [
-                ("Bandung", 70),
-                ("Tasikmalaya", 60)
-            ],
-
-            "Tasikmalaya": [
-                ("Bandung", 110),
-                ("Banjar", 80)
-            ],
-
-            "Banjar": [
-                ("Tasikmalaya", 80),
-                ("Yogyakarta", 200)
-            ],
-
-            "Karawang": [
-                ("Bekasi", 45),
-                ("Cirebon", 140)
-            ],
-
-            "Cirebon": [
-                ("Jakarta", 220),
-                ("Karawang", 140),
-                ("Purwokerto", 170),
-                ("Semarang", 250)
-            ],
+if "saldo" not in st.session_state:
+    st.session_state.saldo = 500000
+
+if "riwayat" not in st.session_state:
+    st.session_state.riwayat = []
+
+# ======================================
+# GRAPH KERETA
+# ======================================
+graf = {
+
+    "Jakarta": [
+        ("Bandung", 150),
+        ("Bekasi", 35),
+        ("Bogor", 60),
+        ("Cirebon", 220)
+    ],
+
+    "Bekasi": [
+        ("Jakarta", 35),
+        ("Karawang", 45),
+        ("Depok", 30)
+    ],
+
+    "Depok": [
+        ("Bekasi", 30),
+        ("Bogor", 40)
+    ],
+
+    "Bogor": [
+        ("Jakarta", 60),
+        ("Sukabumi", 90),
+        ("Depok", 40)
+    ],
+
+    "Sukabumi": [
+        ("Bogor", 90),
+        ("Bandung", 100)
+    ],
+
+    "Bandung": [
+        ("Jakarta", 150),
+        ("Tasikmalaya", 110),
+        ("Garut", 70),
+        ("Cimahi", 20),
+        ("Yogyakarta", 390)
+    ],
+
+    "Cimahi": [
+        ("Bandung", 20)
+    ],
+
+    "Garut": [
+        ("Bandung", 70),
+        ("Tasikmalaya", 60)
+    ],
+
+    "Tasikmalaya": [
+        ("Bandung", 110),
+        ("Banjar", 80)
+    ],
+
+    "Banjar": [
+        ("Tasikmalaya", 80),
+        ("Yogyakarta", 200)
+    ],
+
+    "Karawang": [
+        ("Bekasi", 45),
+        ("Cirebon", 140)
+    ],
+
+    "Cirebon": [
+        ("Jakarta", 220),
+        ("Karawang", 140),
+        ("Purwokerto", 170),
+        ("Semarang", 250)
+    ],
+
+    "Purwokerto": [
+        ("Cirebon", 170),
+        ("Yogyakarta", 180)
+    ],
+
+    "Semarang": [
+        ("Cirebon", 250),
+        ("Solo", 110),
+        ("Surabaya", 350)
+    ],
+
+    "Solo": [
+        ("Semarang", 110),
+        ("Yogyakarta", 65),
+        ("Madiun", 100)
+    ],
+
+    "Madiun": [
+        ("Solo", 100),
+        ("Kediri", 120)
+    ],
+
+    "Kediri": [
+        ("Madiun", 120),
+        ("Malang", 130)
+    ],
+
+    "Yogyakarta": [
+        ("Bandung", 390),
+        ("Solo", 65),
+        ("Purwokerto", 180),
+        ("Banjar", 200),
+        ("Surabaya", 320)
+    ],
+
+    "Surabaya": [
+        ("Semarang", 350),
+        ("Yogyakarta", 320),
+        ("Malang", 95),
+        ("Jember", 200)
+    ],
 
-            "Purwokerto": [
-                ("Cirebon", 170),
-                ("Yogyakarta", 180)
-            ],
+    "Malang": [
+        ("Surabaya", 95),
+        ("Kediri", 130)
+    ],
+
+    "Jember": [
+        ("Surabaya", 200),
+        ("Banyuwangi", 100)
+    ],
+
+    "Banyuwangi": [
+        ("Jember", 100)
+    ]
+}
 
-            "Semarang": [
-                ("Cirebon", 250),
-                ("Solo", 110),
-                ("Surabaya", 350)
-            ],
+# ======================================
+# DIJKSTRA
+# ======================================
+def dijkstra(mulai, tujuan):
 
-            "Solo": [
-                ("Semarang", 110),
-                ("Yogyakarta", 65),
-                ("Madiun", 100)
-            ],
+    jarak = {
+        stasiun: float('inf')
+        for stasiun in graf
+    }
 
-            "Madiun": [
-                ("Solo", 100),
-                ("Kediri", 120)
-            ],
+    jalur = {
+        stasiun: None
+        for stasiun in graf
+    }
 
-            "Kediri": [
-                ("Madiun", 120),
-                ("Malang", 130)
-            ],
+    jarak[mulai] = 0
 
-            "Yogyakarta": [
-                ("Bandung", 390),
-                ("Solo", 65),
-                ("Purwokerto", 180),
-                ("Banjar", 200),
-                ("Surabaya", 320)
-            ],
+    pq = [(0, mulai)]
 
-            "Surabaya": [
-                ("Semarang", 350),
-                ("Yogyakarta", 320),
-                ("Malang", 95),
-                ("Jember", 200)
-            ],
+    while pq:
 
-            "Malang": [
-                ("Surabaya", 95),
-                ("Kediri", 130)
-            ],
+        jarak_sekarang, stasiun_sekarang = heapq.heappop(pq)
 
-            "Jember": [
-                ("Surabaya", 200),
-                ("Banyuwangi", 100)
-            ],
+        if stasiun_sekarang == tujuan:
+            break
 
-            "Banyuwangi": [
-                ("Jember", 100)
-            ]
-        }
+        for tetangga, bobot in graf[stasiun_sekarang]:
 
-    # ======================================
-    # ALGORITMA DIJKSTRA
-    # ======================================
-    def dijkstra(self, mulai, tujuan):
+            jarak_baru = jarak_sekarang + bobot
 
-        jarak = {
+            if jarak_baru < jarak[tetangga]:
 
-            stasiun: float('inf')
+                jarak[tetangga] = jarak_baru
+                jalur[tetangga] = stasiun_sekarang
 
-            for stasiun in self.graf
-        }
+                heapq.heappush(
+                    pq,
+                    (jarak_baru, tetangga)
+                )
 
-        jalur = {
+    rute = []
+
+    step = tujuan
 
-            stasiun: None
+    while step is not None:
 
-            for stasiun in self.graf
-        }
+        rute.insert(0, step)
+        step = jalur[step]
 
-        jarak[mulai] = 0
+    return rute, jarak[tujuan]
 
-        pq = [(0, mulai)]
+# ======================================
+# HEADER
+# ======================================
+st.title("🚆 STASIUN VY JUNCTION")
+st.write("Sistem Pemesanan Tiket Kereta")
 
-        while pq:
+# ======================================
+# SIDEBAR
+# ======================================
+menu = st.sidebar.selectbox(
+    "Pilih Menu",
+    [
+        "Lihat Rute",
+        "Beli Tiket",
+        "Cek Saldo",
+        "Top Up Saldo",
+        "Daftar Stasiun",
+        "Riwayat Tiket"
+    ]
+)
 
-            jarak_sekarang, stasiun_sekarang = heapq.heappop(pq)
+# ======================================
+# LIHAT RUTE
+# ======================================
+if menu == "Lihat Rute":
 
-            if stasiun_sekarang == tujuan:
+    st.subheader("📍 Cek Rute Kereta")
 
-                break
+    col1, col2 = st.columns(2)
 
-            for tetangga, bobot in self.graf[stasiun_sekarang]:
+    with col1:
+        mulai = st.selectbox(
+            "Stasiun Awal",
+            list(graf.keys())
+        )
 
-                jarak_baru = jarak_sekarang + bobot
+    with col2:
+        tujuan = st.selectbox(
+            "Stasiun Tujuan",
+            list(graf.keys())
+        )
 
-                if jarak_baru < jarak[tetangga]:
+    if st.button("Lihat Rute"):
 
-                    jarak[tetangga] = jarak_baru
+        rute, total_jarak = dijkstra(mulai, tujuan)
 
-                    jalur[tetangga] = stasiun_sekarang
+        st.success("Rute Ditemukan!")
 
-                    heapq.heappush(
-                        pq,
-                        (jarak_baru, tetangga)
-                    )
+        st.write(f"🚉 Dari : {mulai}")
+        st.write(f"🚉 Ke : {tujuan}")
+        st.write(f"🚆 Jalur : {' → '.join(rute)}")
+        st.write(f"📍 Total Jarak : {total_jarak} KM")
 
-        rute = []
+# ======================================
+# BELI TIKET
+# ======================================
+elif menu == "Beli Tiket":
 
-        step = tujuan
+    st.subheader("🎫 Pembelian Tiket")
 
-        while step is not None:
+    nama = st.text_input("Nama Penumpang")
 
-            rute.insert(0, step)
+    col1, col2 = st.columns(2)
 
-            step = jalur[step]
+    with col1:
+        mulai = st.selectbox(
+            "Stasiun Awal",
+            list(graf.keys())
+        )
 
-        return rute, jarak[tujuan]
+    with col2:
+        tujuan = st.selectbox(
+            "Stasiun Tujuan",
+            list(graf.keys())
+        )
 
-    # ======================================
-    # TAMPIL STASIUN
-    # ======================================
-    def tampil_stasiun(self):
+    kelas = st.selectbox(
+        "Pilih Kelas",
+        ["Ekonomi", "Bisnis", "Eksekutif"]
+    )
 
-        print("\n========== DAFTAR STASIUN ==========")
+    jumlah = st.number_input(
+        "Jumlah Tiket",
+        min_value=1,
+        value=1
+    )
 
-        for stasiun in self.graf:
+    jadwal = st.selectbox(
+        "Pilih Jadwal",
+        ["08:00 WIB", "12:00 WIB", "18:00 WIB"]
+    )
 
-            print(f"🚉 {stasiun}")
+    kursi = st.text_input("Nomor Kursi", "A1")
 
-    # ======================================
-    # TAMPIL GRAPH
-    # ======================================
-    def tampil_graph(self):
+    if st.button("Pesan Tiket"):
 
-        print("\n========== GRAPH RUTE ==========")
+        rute, total_jarak = dijkstra(mulai, tujuan)
 
-        for stasiun in self.graf:
-
-            print(f"\n🚉 {stasiun}")
-
-            for tujuan, jarak in self.graf[stasiun]:
-
-                print(f"   ➡️ {tujuan} ({jarak} KM)")
-
-    # ======================================
-    # LIHAT RUTE
-    # ======================================
-    def lihat_rute(self):
-
-        print("\n========== LIHAT RUTE ==========")
-
-        mulai = input("Masukkan Stasiun Awal   : ").title()
-
-        tujuan = input("Masukkan Stasiun Tujuan: ").title()
-
-        if mulai not in self.graf or tujuan not in self.graf:
-
-            print("\n❌ Stasiun tidak ditemukan!")
-
-            return
-
-        rute, total_jarak = self.dijkstra(mulai, tujuan)
-
-        print("\n========== HASIL RUTE ==========")
-
-        print(f"🚉 Dari : {mulai}")
-
-        print(f"🚉 Ke    : {tujuan}")
-
-        print(f"\n🚆 Jalur : {' -> '.join(rute)}")
-
-        print(f"📍 Total Jarak : {total_jarak} KM")
-
-    # ======================================
-    # BELI TIKET
-    # ======================================
-    def beli_tiket(self, wallet, user):
-
-        print("\n========== PEMBELIAN TIKET ==========")
-
-        mulai = input("Masukkan Stasiun Awal   : ").title()
-
-        tujuan = input("Masukkan Stasiun Tujuan: ").title()
-
-        if mulai not in self.graf or tujuan not in self.graf:
-
-            print("\n❌ Stasiun tidak ditemukan!")
-
-            return
-
-        rute, total_jarak = self.dijkstra(mulai, tujuan)
-
-        print("\n========== PILIH KELAS ==========")
-
-        print("1. Ekonomi")
-        print("2. Bisnis")
-        print("3. Eksekutif")
-
-        kelas = input("Pilih Kelas : ")
-
-        if kelas == "1":
-
-            nama_kelas = "Ekonomi"
-
+        if kelas == "Ekonomi":
             harga = total_jarak * 1000
 
-        elif kelas == "2":
-
-            nama_kelas = "Bisnis"
-
+        elif kelas == "Bisnis":
             harga = total_jarak * 1500
 
-        elif kelas == "3":
-
-            nama_kelas = "Eksekutif"
-
-            harga = total_jarak * 2000
-
         else:
-
-            print("\n❌ Kelas tidak tersedia!")
-
-            return
-
-        jumlah = int(input("Jumlah Tiket : "))
+            harga = total_jarak * 2000
 
         total = harga * jumlah
 
-        jadwal = [
-            "08:00 WIB",
-            "12:00 WIB",
-            "18:00 WIB"
-        ]
+        if st.session_state.saldo >= total:
 
-        print("\n========== PILIH JADWAL ==========")
+            st.session_state.saldo -= total
 
-        for i in range(len(jadwal)):
+            kode = random.randint(10000, 99999)
 
-            print(f"{i+1}. {jadwal[i]}")
+            st.session_state.riwayat.append({
 
-        pilih_jadwal = int(input("Pilih Jadwal : "))
+                "nama": nama,
+                "asal": mulai,
+                "tujuan": tujuan,
+                "kelas": kelas,
+                "harga": total
 
-        jadwal_terpilih = jadwal[pilih_jadwal - 1]
+            })
 
-        kursi = input("Pilih Kursi (Contoh A1) : ").upper()
+            st.success("✅ Pembayaran Berhasil!")
 
-        kode_tiket = random.randint(10000, 99999)
+            st.markdown(f"""
+            ### 🎟️ DETAIL TIKET
 
-        print("\n========== DETAIL PEMBELIAN ==========")
+            👤 Nama : {nama}
 
-        print(f"👤 Nama          : {user.nama}")
+            🚉 Dari : {mulai}
 
-        print(f"🚉 Dari          : {mulai}")
+            🚉 Ke : {tujuan}
 
-        print(f"🚉 Ke            : {tujuan}")
+            🚆 Jalur : {' → '.join(rute)}
 
-        print(f"🚆 Jalur         : {' -> '.join(rute)}")
+            🎫 Kelas : {kelas}
 
-        print(f"🎫 Kelas         : {nama_kelas}")
+            🪑 Kursi : {kursi}
 
-        print(f"🪑 Kursi         : {kursi}")
+            🕒 Jadwal : {jadwal}
 
-        print(f"🕒 Jadwal        : {jadwal_terpilih}")
+            💵 Total : Rp{total}
 
-        print(f"🎟️ Jumlah Tiket : {jumlah}")
-
-        print(f"📍 Total Jarak   : {total_jarak} KM")
-
-        print(f"💵 Total Bayar   : Rp{total}")
-
-        print(f"💰 Saldo Anda    : Rp{wallet.saldo}")
-
-        konfirmasi = input("\nLanjut Pembayaran? (y/n) : ")
-
-        if konfirmasi.lower() == "y":
-
-            if wallet.bayar(total):
-
-                self.riwayat.append({
-
-                    "nama": user.nama,
-                    "asal": mulai,
-                    "tujuan": tujuan,
-                    "kelas": nama_kelas,
-                    "harga": total
-                })
-
-                print("\n✅ PEMBAYARAN BERHASIL!")
-
-                print(f"💰 Sisa Saldo : Rp{wallet.saldo}")
-
-                print("""
-╔══════════════════════════════════════╗
-║         ACCESS BY TRAIN 🚆          ║
-╠══════════════════════════════════════╣
-""")
-
-                print(f"║ Kode Tiket : {kode_tiket}")
-
-                print(f"║ Nama       : {user.nama}")
-
-                print(f"║ Dari       : {mulai}")
-
-                print(f"║ Tujuan     : {tujuan}")
-
-                print(f"║ Kelas      : {nama_kelas}")
-
-                print(f"║ Kursi      : {kursi}")
-
-                print(f"║ Jadwal     : {jadwal_terpilih}")
-
-                print(f"║ Total      : Rp{total}")
-
-                print("╚══════════════════════════════════════╝")
-
-            else:
-
-                print("\n❌ Saldo tidak cukup!")
+            🔖 Kode Tiket : {kode}
+            """)
 
         else:
 
-            print("\n❌ Pembayaran dibatalkan!")
-
-    # ======================================
-    # RIWAYAT PEMBELIAN
-    # ======================================
-    def riwayat_tiket(self):
-
-        print("\n========== RIWAYAT TIKET ==========")
-
-        if len(self.riwayat) == 0:
-
-            print("Belum ada pembelian tiket.")
-
-        else:
-
-            for data in self.riwayat:
-
-                print(f"""
-👤 Nama    : {data['nama']}
-🚉 Dari    : {data['asal']}
-🚉 Ke      : {data['tujuan']}
-🎫 Kelas   : {data['kelas']}
-💵 Harga   : Rp{data['harga']}
-====================================
-""")
+            st.error("❌ Saldo Tidak Cukup!")
 
 # ======================================
-# CEK KONEKSI STASIUN
+# CEK SALDO
 # ======================================
-    def cek_koneksi(self):
+elif menu == "Cek Saldo":
 
-        stasiun = input("Masukkan Nama Stasiun : ").title()
+    st.subheader("💰 E-Wallet")
 
-        if stasiun in self.graf:
-
-            print(f"\n🚉 Koneksi Dari {stasiun} :")
-
-            for tujuan, jarak in self.graf[stasiun]:
-
-                print(f"➡️ {tujuan} ({jarak} KM)")
-
-        else:
-
-
-            print("\n❌ Stasiun tidak ditemukan!")
-
+    st.info(f"Saldo Anda : Rp{st.session_state.saldo}")
 
 # ======================================
-# PROGRAM UTAMA
+# TOP UP
 # ======================================
-def main():
+elif menu == "Top Up Saldo":
 
-    print("========== LOGIN ==========")
+    st.subheader("➕ Top Up Saldo")
 
-    nama = input("Nama  : ")
+    jumlah = st.number_input(
+        "Masukkan Jumlah Top Up",
+        min_value=1000,
+        value=10000
+    )
 
-    no_hp = input("No HP : ")
+    if st.button("Top Up"):
 
-    email = input("Email : ")
+        st.session_state.saldo += jumlah
 
-    user = Login(nama, no_hp, email)
+        st.success("✅ Top Up Berhasil!")
 
-    user.welcome()
-
-    sistem = GraphKereta()
-
-    wallet = EWallet()
-
-    while True:
-
-        print("\n========== MENU ACCESS BY TRAIN ==========")
-
-        print("1. Lihat Rute")
-        print("2. Beli Tiket")
-        print("3. Cek Saldo")
-        print("4. Top Up Saldo")
-        print("5. Tampilkan Graph")
-        print("6. Daftar Stasiun")
-        print("7. Koneksi Stasiun")
-        print("7. Riwayat Tiket")
-        print("9. Logout")
-
-        menu = input("Pilih Menu : ")
-
-        if menu == "1":
-
-            sistem.lihat_rute()
-
-        elif menu == "2":
-
-            sistem.beli_tiket(wallet, user)
-
-        elif menu == "3":
-
-            wallet.cek_saldo()
-
-        elif menu == "4":
-
-            wallet.topup()
-
-        elif menu == "5":
-
-            sistem.tampil_graph()
-
-        elif menu == "6":
-
-            sistem.tampil_stasiun()
-
-        elif menu == "7":
-
-            sistem.cek_koneksi()
-
-        elif menu == "8":
-
-            sistem.riwayat_tiket()
-
-        elif menu == "9":
-
-            print("\nTerima kasih telah menggunakan Access By Train 🚆")
-
-            break
-
-        else:
-
-            print("\n❌ Menu tidak tersedia!")
-
+        st.write(f"💰 Saldo Sekarang : Rp{st.session_state.saldo}")
 
 # ======================================
-# MENJALANKAN PROGRAM
+# DAFTAR STASIUN
 # ======================================
-main()
+elif menu == "Daftar Stasiun":
+
+    st.subheader("🚉 Daftar Stasiun")
+
+    for stasiun in graf:
+        st.write(f"✅ {stasiun}")
+
+# ======================================
+# RIWAYAT
+# ======================================
+elif menu == "Riwayat Tiket":
+
+    st.subheader("📜 Riwayat Pembelian")
+
+    if len(st.session_state.riwayat) == 0:
+
+        st.warning("Belum ada pembelian tiket.")
+
+    else:
+
+        for data in st.session_state.riwayat:
+
+            st.markdown(f"""
+            ---
+            👤 Nama : {data['nama']}
+
+            🚉 Dari : {data['asal']}
+
+            🚉 Ke : {data['tujuan']}
+
+            🎫 Kelas : {data['kelas']}
+
+            💵 Harga : Rp{data['harga']}
+            """)
