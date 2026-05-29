@@ -382,6 +382,16 @@ elif menu == "Beli Tiket":
 
             st.error("❌ Saldo Tidak Cukup!")
 
+            st.markdown(f"""
+            ### 💳 INFORMASI PEMBAYARAN
+
+            💵 Total Harga Tiket : Rp{total}
+
+            💰 Saldo Anda : Rp{st.session_state.saldo}
+
+            ⚠️ Silakan lakukan top up saldo terlebih dahulu.
+            """)
+
 # ======================================
 # CEK SALDO
 # ======================================
