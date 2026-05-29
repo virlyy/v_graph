@@ -1,9 +1,10 @@
+```python
 import streamlit as st
 import heapq
 import random
 
 # ======================================
-# CONFIG
+# CONFIG PAGE
 # ======================================
 st.set_page_config(
     page_title="Stasiun VY Junction",
@@ -33,13 +34,6 @@ st.markdown("""
 
 .stTextInput>div>div>input {
     border-radius: 10px;
-}
-
-.box {
-    padding: 20px;
-    border-radius: 15px;
-    background-color: #1e293b;
-    margin-bottom: 20px;
 }
 
 </style>
@@ -242,7 +236,7 @@ st.title("🚆 STASIUN VY JUNCTION")
 st.write("Sistem Pemesanan Tiket Kereta")
 
 # ======================================
-# SIDEBAR
+# SIDEBAR MENU
 # ======================================
 menu = st.sidebar.selectbox(
     "Pilih Menu",
@@ -252,6 +246,7 @@ menu = st.sidebar.selectbox(
         "Cek Saldo",
         "Top Up Saldo",
         "Daftar Stasiun",
+        "Cek Koneksi Stasiun",
         "Riwayat Tiket"
     ]
 )
@@ -398,7 +393,7 @@ elif menu == "Cek Saldo":
     st.info(f"Saldo Anda : Rp{st.session_state.saldo}")
 
 # ======================================
-# TOP UP
+# TOP UP SALDO
 # ======================================
 elif menu == "Top Up Saldo":
 
@@ -429,7 +424,25 @@ elif menu == "Daftar Stasiun":
         st.write(f"✅ {stasiun}")
 
 # ======================================
-# RIWAYAT
+# CEK KONEKSI STASIUN
+# ======================================
+elif menu == "Cek Koneksi Stasiun":
+
+    st.subheader("🔗 Koneksi Stasiun")
+
+    stasiun = st.selectbox(
+        "Pilih Stasiun",
+        list(graf.keys())
+    )
+
+    st.write(f"### 🚉 Koneksi Dari {stasiun}")
+
+    for tujuan, jarak in graf[stasiun]:
+
+        st.write(f"➡️ {tujuan} ({jarak} KM)")
+
+# ======================================
+# RIWAYAT TIKET
 # ======================================
 elif menu == "Riwayat Tiket":
 
@@ -455,3 +468,4 @@ elif menu == "Riwayat Tiket":
 
             💵 Harga : Rp{data['harga']}
             """)
+```
