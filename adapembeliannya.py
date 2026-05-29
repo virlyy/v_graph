@@ -38,6 +38,7 @@ class EWallet:
             "ShopeePay": 350000,
             "Bank BCA": 1000000,
             "Bank Mandiri": 750000
+
         }
 
     def bayar(self, metode, total):
@@ -77,33 +78,106 @@ class GraphKereta:
                 ("Depok", 30)
             ],
 
+            "Depok": [
+                ("Bekasi", 30),
+                ("Bogor", 40)
+            ],
+
             "Bogor": [
                 ("Jakarta", 60),
                 ("Sukabumi", 90),
                 ("Depok", 40)
             ],
 
+            "Sukabumi": [
+                ("Bogor", 90),
+                ("Bandung", 100)
+            ],
+
             "Bandung": [
                 ("Jakarta", 150),
-                ("Garut", 70),
                 ("Tasikmalaya", 110),
+                ("Garut", 70),
+                ("Cimahi", 20),
                 ("Yogyakarta", 390)
+            ],
+
+            "Cimahi": [
+                ("Bandung", 20)
+            ],
+
+            "Garut": [
+                ("Bandung", 70),
+                ("Tasikmalaya", 60)
+            ],
+
+            "Tasikmalaya": [
+                ("Bandung", 110),
+                ("Banjar", 80)
+            ],
+
+            "Banjar": [
+                ("Tasikmalaya", 80),
+                ("Yogyakarta", 200)
+            ],
+
+            "Karawang": [
+                ("Bekasi", 45),
+                ("Cirebon", 140)
+            ],
+
+            "Cirebon": [
+                ("Jakarta", 220),
+                ("Karawang", 140),
+                ("Purwokerto", 170),
+                ("Semarang", 250)
+            ],
+
+            "Purwokerto": [
+                ("Cirebon", 170),
+                ("Yogyakarta", 180)
+            ],
+
+            "Semarang": [
+                ("Cirebon", 250),
+                ("Solo", 110),
+                ("Surabaya", 350)
+            ],
+
+            "Solo": [
+                ("Semarang", 110),
+                ("Yogyakarta", 65),
+                ("Madiun", 100)
+            ],
+
+            "Madiun": [
+                ("Solo", 100),
+                ("Kediri", 120)
+            ],
+
+            "Kediri": [
+                ("Madiun", 120),
+                ("Malang", 130)
             ],
 
             "Yogyakarta": [
                 ("Bandung", 390),
                 ("Solo", 65),
+                ("Purwokerto", 180),
+                ("Banjar", 200),
                 ("Surabaya", 320)
             ],
 
             "Surabaya": [
+                ("Semarang", 350),
                 ("Yogyakarta", 320),
                 ("Malang", 95),
                 ("Jember", 200)
             ],
 
             "Malang": [
-                ("Surabaya", 95)
+                ("Surabaya", 95),
+                ("Kediri", 130)
             ],
 
             "Jember": [
@@ -172,7 +246,7 @@ class GraphKereta:
 
 
 # ======================================
-# SESSION STATE
+# SESSION
 # ======================================
 if "login" not in st.session_state:
 
@@ -186,6 +260,10 @@ if "sistem" not in st.session_state:
 
     st.session_state.sistem = GraphKereta()
 
+if "menu" not in st.session_state:
+
+    st.session_state.menu = "rute"
+
 
 # ======================================
 # LOGIN PAGE
@@ -194,7 +272,7 @@ if st.session_state.login == False:
 
     st.title("🚆 STASIUN VY JUNCTION")
 
-    st.subheader("🔐 Login User")
+    st.subheader("🔐 LOGIN USER")
 
     nama = st.text_input("👤 Nama")
 
@@ -202,7 +280,7 @@ if st.session_state.login == False:
 
     email = st.text_input("📧 Email")
 
-    if st.button("🚪 Login"):
+    if st.button("🚪 Login", use_container_width=True):
 
         if nama and no_hp and email:
 
@@ -218,7 +296,7 @@ if st.session_state.login == False:
 
         else:
 
-            st.warning("⚠️ Lengkapi data login terlebih dahulu!")
+            st.warning("⚠️ Lengkapi Data Login!")
 
 
 # ======================================
@@ -236,29 +314,52 @@ else:
 
     st.success(f"Selamat Datang {user.nama}")
 
-    menu = st.sidebar.radio(
+    st.markdown("## 📌 MENU ACCESS BY TRAIN")
 
-        "📌 MENU",
+    col1, col2, col3 = st.columns(3)
 
-        [
+    with col1:
 
-            "🗺️ Lihat Rute",
-            "🎫 Beli Tiket",
-            "🌐 Tampilkan Graph",
-            "🚉 Daftar Stasiun",
-            "🔗 Koneksi Stasiun",
-            "📜 Riwayat Tiket",
-            "🔒 Logout"
+        if st.button("🗺️ Lihat Rute", use_container_width=True):
 
-        ]
-    )
+            st.session_state.menu = "rute"
+
+        if st.button("🌐 Tampilkan Graph", use_container_width=True):
+
+            st.session_state.menu = "graph"
+
+        if st.button("📜 Riwayat Tiket", use_container_width=True):
+
+            st.session_state.menu = "riwayat"
+
+    with col2:
+
+        if st.button("🎫 Beli Tiket", use_container_width=True):
+
+            st.session_state.menu = "beli"
+
+        if st.button("🚉 Daftar Stasiun", use_container_width=True):
+
+            st.session_state.menu = "stasiun"
+
+    with col3:
+
+        if st.button("🔗 Koneksi Stasiun", use_container_width=True):
+
+            st.session_state.menu = "koneksi"
+
+        if st.button("🔒 Logout", use_container_width=True):
+
+            st.session_state.login = False
+
+            st.rerun()
 
     # ======================================
     # LIHAT RUTE
     # ======================================
-    if menu == "🗺️ Lihat Rute":
+    if st.session_state.menu == "rute":
 
-        st.header("🗺️ Lihat Rute Kereta")
+        st.header("🗺️ LIHAT RUTE")
 
         mulai = st.selectbox(
             "🚉 Stasiun Awal",
@@ -286,9 +387,9 @@ else:
     # ======================================
     # BELI TIKET
     # ======================================
-    elif menu == "🎫 Beli Tiket":
+    elif st.session_state.menu == "beli":
 
-        st.header("🎫 Pemesanan Tiket")
+        st.header("🎫 PEMBELIAN TIKET")
 
         mulai = st.selectbox(
             "🚉 Dari",
@@ -412,9 +513,9 @@ Total      : Rp{total}
     # ======================================
     # GRAPH
     # ======================================
-    elif menu == "🌐 Tampilkan Graph":
+    elif st.session_state.menu == "graph":
 
-        st.header("🌐 Graph Jalur Kereta")
+        st.header("🌐 GRAPH RUTE")
 
         for stasiun in sistem.graf:
 
@@ -425,27 +526,25 @@ Total      : Rp{total}
                 st.write(f"➡️ {tujuan} ({jarak} KM)")
 
     # ======================================
-    # DAFTAR STASIUN
+    # STASIUN
     # ======================================
-    elif menu == "🚉 Daftar Stasiun":
+    elif st.session_state.menu == "stasiun":
 
-        st.header("🚉 Daftar Stasiun")
+        st.header("🚉 DAFTAR STASIUN")
 
         for stasiun in sistem.graf:
 
             st.write(f"🚆 {stasiun}")
 
     # ======================================
-    # KONEKSI STASIUN
+    # KONEKSI
     # ======================================
-    elif menu == "🔗 Koneksi Stasiun":
+    elif st.session_state.menu == "koneksi":
 
-        st.header("🔗 Koneksi Stasiun")
+        st.header("🔗 KONEKSI STASIUN")
 
         pilih = st.selectbox(
-
             "🚉 Pilih Stasiun",
-
             list(sistem.graf.keys())
         )
 
@@ -458,13 +557,13 @@ Total      : Rp{total}
     # ======================================
     # RIWAYAT
     # ======================================
-    elif menu == "📜 Riwayat Tiket":
+    elif st.session_state.menu == "riwayat":
 
-        st.header("📜 Riwayat Pembelian")
+        st.header("📜 RIWAYAT TIKET")
 
         if len(sistem.riwayat) == 0:
 
-            st.warning("Belum ada riwayat tiket.")
+            st.warning("Belum ada pembelian tiket.")
 
         else:
 
@@ -477,12 +576,3 @@ Total      : Rp{total}
 🎫 Kelas : {data['kelas']}
 💵 Harga : Rp{data['harga']}
 """)
-
-    # ======================================
-    # LOGOUT
-    # ======================================
-    elif menu == "🔒 Logout":
-
-        st.session_state.login = False
-
-        st.rerun()
