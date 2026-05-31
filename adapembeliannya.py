@@ -287,7 +287,7 @@ else:
 
         st.session_state.menu = "beli"
 
-    if st.sidebar.button("🌐 Tampilkan Graph", use_container_width=True):
+    if st.sidebar.button("🌐 Jaringan Rute Kereta", use_container_width=True):
 
         st.session_state.menu = "graph"
 
