@@ -279,6 +279,9 @@ else:
     if st.sidebar.button("🗺️ Lihat Rute", use_container_width=True):
 
         st.session_state.menu = "rute"
+    
+    if st.sidebar.button("🚄 Cari Jalur Tercepat",use_container_width=True):
+        st.session_state.menu = "tercepat"
 
     if st.sidebar.button("🎫 Beli Tiket", use_container_width=True):
 
@@ -347,6 +350,50 @@ else:
 
 📍 Total Jarak : {total_jarak} KM
 """)
+            
+    # ==========================================
+    # Cari Rute Tercepat
+    # ==========================================
+    elif st.session_state.menu == "tercepat":
+        st.subheader("🚄 Cari Jalur Tercepat")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            mulai = st.selectbox(
+                "🚉 Stasiun Awal",
+                list(kereta.graf.keys()),
+                key="awal_cepat"
+                )
+        
+        with col2:
+            tujuan = st.selectbox(
+                "🚉 Stasiun Tujuan",
+                list(kereta.graf.keys()),
+                key="tujuan_cepat"
+                )
+            
+        if st.button("⚡ Cari Jalur Tercepat"):
+            rute, total_jarak = kereta.dijkstra(
+                mulai,
+                tujuan
+                )
+            
+            estimasi = total_jarak // 2
+            
+            st.success("Jalur tercepat berhasil ditemukan")
+            st.info(f"""
+                    🚉 Dari          : {mulai}
+                    
+                    🚉 Tujuan        : {tujuan}
+                    
+                    🚆 Jalur Cepat   : {' → '.join(rute)}
+                    
+                    📍 Jarak Minimum : {total_jarak} KM
+                    
+                    ⏱️ Estimasi      : {estimasi} Menit
+                    
+                    🔥 Direkomendasikan untuk perjalanan cepat""")
 
     # ==========================================
     # BELI TIKET
@@ -370,6 +417,14 @@ else:
                 "🚉 Stasiun Tujuan ",
                 list(kereta.graf.keys())
             )
+
+        jalur = st.radio(
+            "⚡ Pilih Jalur",
+            [
+                "Jalur Tercepat",
+                "Jalur Reguler"
+                ]
+                )
 
         kelas = st.selectbox(
             "🎫 Pilih Kelas",
@@ -409,9 +464,10 @@ else:
         if st.button("💳 Pesan Tiket"):
 
             rute, total_jarak = kereta.dijkstra(
-                mulai2,
-                tujuan2
-            )
+                 mulai2,
+                 tujuan2
+                 )
+            tipe_jalur = jalur
 
             if kelas == "Ekonomi":
 
@@ -430,33 +486,36 @@ else:
             kode = random.randint(10000, 99999)
 
             st.session_state.riwayat.append({
-
                 "nama": st.session_state.nama,
                 "asal": mulai2,
                 "tujuan": tujuan2,
+                "jalur": tipe_jalur,
                 "kelas": kelas,
                 "harga": total,
                 "bayar": pembayaran
-            })
+                })
 
             st.success("✅ Pembayaran Berhasil!")
 
             st.code(f"""
 ══════════════════════════════
-       ACCESS BY TRAIN 🚆
+      🎫 E-TIKET KERETA
 ══════════════════════════════
 
 🎟️ Kode Tiket : {kode}
 👤 Nama       : {st.session_state.nama}
 🚉 Dari       : {mulai2}
 🚉 Tujuan     : {tujuan2}
-🚆 Jalur      : {' -> '.join(rute)}
+⚡ Jalur      : {tipe_jalur}
+🚆 Rute       : {' -> '.join(rute)}
 🎫 Kelas      : {kelas}
 🪑 Kursi      : {kursi}
 🕒 Jadwal     : {jadwal}
 💳 Pembayaran : {pembayaran}
-💵 Total      : Rp{total}
+💵 Total      : Rp{total:,}
 
+══════════════════════════════
+Selamat Menikmati Perjalanan 🚄
 ══════════════════════════════
 """)
 
