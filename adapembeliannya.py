@@ -231,6 +231,10 @@ if "menu" not in st.session_state:
 
     st.session_state.menu = "rute"
 
+if "Konfigurasi_logout" not in st.session_state:
+
+    st.session_state.Konfigurasi_logout = False
+
 # ==========================================
 # OBJECT GRAPH
 # ==========================================
@@ -305,9 +309,25 @@ else:
 
     if st.sidebar.button("🔒 Logout", use_container_width=True):
 
-        st.session_state.login = False
+        st.session_state.konfirmasi_logout = True
+    
+    if st.session_state.konfirmasi_logout:
 
-        st.rerun()
+        st.sidebar.warning ("Apakah yakin ingin keluar?")
+
+        col1, col2 = st.sidebar.coloumns(2)
+
+    with col1:
+        if st.button("✅ Ya"):
+            st.session_state.login = False
+            st.session_state.konfirmasi_logout = False
+            st.rerun()
+
+    with col2:
+        if st.button("❌ Tidak"):
+            st.session_state.konfirmasi_logout = False
+            st.rerun()
+
 
     # ==========================================
     # LIHAT RUTE
