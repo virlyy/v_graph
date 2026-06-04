@@ -231,9 +231,9 @@ if "menu" not in st.session_state:
 
     st.session_state.menu = "rute"
 
-if "Konfigurasi_logout" not in st.session_state:
+if "Konfirmasi_logout" not in st.session_state:
 
-    st.session_state.Konfigurasi_logout = False
+    st.session_state.Konfirmasi_logout = False
 
 # ==========================================
 # OBJECT GRAPH
