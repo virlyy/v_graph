@@ -3,7 +3,7 @@ import heapq
 import random
 
 # ==========================================
-# CONFIG PAGE
+# KONFIGURASI HALAMAN 
 # ==========================================
 st.set_page_config(
     page_title="Stasiun VY Junction",
@@ -158,9 +158,9 @@ class GraphKereta:
         }
 
     # ==========================================
-    # DIJKSTRA
+    # JALUR PENDEK
     # ==========================================
-    def dijkstra(self, mulai, tujuan):
+    def jalur_pendek(self, mulai, tujuan):
 
         jarak = {
 
@@ -217,7 +217,7 @@ class GraphKereta:
 
 
 # ==========================================
-# SESSION STATE
+# PENYIMPANAN DATA
 # ==========================================
 if "login" not in st.session_state:
 
@@ -237,7 +237,7 @@ if "menu" not in st.session_state:
 kereta = GraphKereta()
 
 # ==========================================
-# LOGIN PAGE
+# HALAMAN LOGIN
 # ==========================================
 if st.session_state.login == False:
 
@@ -272,7 +272,7 @@ else:
     st.success(f"✅ Selamat Datang, {st.session_state.nama}")
 
     # ==========================================
-    # MENU SIDEBAR
+    # PILIHAN MENU 
     # ==========================================
     st.sidebar.title("🚆 MENU")
 
