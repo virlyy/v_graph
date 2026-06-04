@@ -219,22 +219,21 @@ class GraphKereta:
 # ==========================================
 # PENYIMPANAN DATA
 # ==========================================
-if "login" not in st.session_state:
+if "login" not in st.session_state: 
+    
+    st.session_state.login = False 
 
-    st.session_state.login = False
+if "riwayat" not in st.session_state: 
+    
+    st.session_state.riwayat = [] 
 
-if "riwayat" not in st.session_state:
+if "menu" not in st.session_state: 
+    
+    st.session_state.menu = "rute" 
 
-    st.session_state.riwayat = []
+if "konfirmasi_logout" not in st.session_state:
 
-if "menu" not in st.session_state:
-
-    st.session_state.menu = "rute"
-
-if "Konfirmasi_logout" not in st.session_state:
-
-    st.session_state.Konfirmasi_logout = False
-
+    st.session_state.konfirmasi_logout = False
 # ==========================================
 # OBJECT GRAPH
 # ==========================================
@@ -308,26 +307,29 @@ else:
         st.session_state.menu = "riwayat"
 
     if st.sidebar.button("🔒 Logout", use_container_width=True):
-
+        
         st.session_state.konfirmasi_logout = True
-    
-    if st.session_state.konfirmasi_logout:
 
-        st.sidebar.warning ("Apakah yakin ingin keluar?")
+if st.session_state.konfirmasi_logout:
 
-        col1, col2 = st.sidebar.coloumns(2)
+    st.sidebar.warning("Apakah yakin ingin keluar?")
+
+    col1, col2 = st.sidebar.columns(2)
 
     with col1:
-        if st.button("✅ Ya"):
+        if st.button("✅ Ya", key="ya_logout"):
+
             st.session_state.login = False
             st.session_state.konfirmasi_logout = False
+
             st.rerun()
 
     with col2:
-        if st.button("❌ Tidak"):
-            st.session_state.konfirmasi_logout = False
-            st.rerun()
+        if st.button("❌ Tidak", key="tidak_logout"):
 
+            st.session_state.konfirmasi_logout = False
+
+            st.rerun()
 
     # ==========================================
     # LIHAT RUTE
@@ -394,7 +396,7 @@ else:
                 )
             
         if st.button("⚡ Cari Jalur Tercepat"):
-            rute, total_jarak = kereta.dijkstra(
+            rute, total_jarak = kereta.jalur_pendek(
                 mulai,
                 tujuan
                 )
