@@ -3,7 +3,7 @@ import heapq
 import random
 
 # ==========================================
-# KONFIGURASI HALAMAN 
+# CONFIG PAGE
 # ==========================================
 st.set_page_config(
     page_title="Stasiun VY Junction",
@@ -158,9 +158,9 @@ class GraphKereta:
         }
 
     # ==========================================
-    # JALUR PENDEK
+    # DIJKSTRA
     # ==========================================
-    def jalur_pendek(self, mulai, tujuan):
+    def dijkstra(self, mulai, tujuan):
 
         jarak = {
 
@@ -217,19 +217,19 @@ class GraphKereta:
 
 
 # ==========================================
-# PENYIMPANAN DATA
+# SESSION STATE
 # ==========================================
-if "login" not in st.session_state: 
-    
-    st.session_state.login = False 
+if "login" not in st.session_state:
 
-if "riwayat" not in st.session_state: 
-    
-    st.session_state.riwayat = [] 
+    st.session_state.login = False
 
-if "menu" not in st.session_state: 
-    
-    st.session_state.menu = "rute" 
+if "riwayat" not in st.session_state:
+
+    st.session_state.riwayat = []
+
+if "menu" not in st.session_state:
+
+    st.session_state.menu = "rute"
 
 # ==========================================
 # OBJECT GRAPH
@@ -237,7 +237,7 @@ if "menu" not in st.session_state:
 kereta = GraphKereta()
 
 # ==========================================
-# HALAMAN LOGIN
+# LOGIN PAGE
 # ==========================================
 if st.session_state.login == False:
 
@@ -272,7 +272,7 @@ else:
     st.success(f"✅ Selamat Datang, {st.session_state.nama}")
 
     # ==========================================
-    # PILIHAN MENU 
+    # MENU SIDEBAR
     # ==========================================
     st.sidebar.title("🚆 MENU")
 
@@ -304,30 +304,10 @@ else:
         st.session_state.menu = "riwayat"
 
     if st.sidebar.button("🔒 Logout", use_container_width=True):
-        
-        st.session_state.konfirmasi_logout = "menu"
 
+        st.session_state.login = False
 
-# ==========================================
-# KONFIRMASI LOGOUT
-# ==========================================
-if "konfirmasi_logout" in st.session_state and st.session_state.konfirmasi_logout:
-
-    st.warning("⚠️ Apakah Anda yakin ingin keluar?")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        if st.button("✔️ Ya, Keluar"):
-            st.session_state.login = False
-            st.session_state.menu = "rute"
-            st.session_state.konfirmasi_logout = False
-            st.rerun()
-
-    with col2:
-        if st.button("❌ Tidak"):
-            st.session_state.konfirmasi_logout = False
-            st.rerun()
+        st.rerun()
 
     # ==========================================
     # LIHAT RUTE
@@ -394,7 +374,7 @@ if "konfirmasi_logout" in st.session_state and st.session_state.konfirmasi_logou
                 )
             
         if st.button("⚡ Cari Jalur Tercepat"):
-            rute, total_jarak = kereta.jalur_pendek(
+            rute, total_jarak = kereta.dijkstra(
                 mulai,
                 tujuan
                 )
