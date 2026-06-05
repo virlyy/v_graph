@@ -305,7 +305,7 @@ else:
 
     if st.sidebar.button("🔒 Logout", use_container_width=True):
         
-        st.session_state.konfirmasi_logout = True
+        st.session_state.konfirmasi_logout = "menu"
 
 
 # ==========================================
