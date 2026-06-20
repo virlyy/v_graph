@@ -226,45 +226,122 @@ else:
             st.info(f"Jarak: {d} KM | Estimasi: {d//2} menit")
 
 
-    # ==========================================
-    # BELI TIKET
-    # ==========================================
-    elif st.session_state.menu == "beli":
+   # ==========================================
+# BELI TIKET (VERSI E-WALLET + TRANSFER)
+# ==========================================
+elif st.session_state.menu == "beli":
 
-        st.subheader("🎫 Beli Tiket")
+    st.subheader("🎫 Pembelian Tiket")
 
-        a = st.selectbox("Dari", list(kereta.graf.keys()))
-        b = st.selectbox("Ke", list(kereta.graf.keys()))
-        kelas = st.selectbox("Kelas", ["Ekonomi", "Bisnis", "Eksekutif"])
-        jumlah = st.number_input("Jumlah", 1)
+    col1, col2 = st.columns(2)
 
-        if st.button("Bayar"):
+    with col1:
+        asal = st.selectbox("🚉 Stasiun Awal", list(kereta.graf.keys()), key="asal_beli")
 
-            r, d = kereta.dijkstra(a, b)
+    with col2:
+        tujuan = st.selectbox("🚉 Stasiun Tujuan", list(kereta.graf.keys()), key="tujuan_beli")
+
+    jalur = st.radio(
+        "⚡ Pilih Jalur",
+        ["Jalur Tercepat", "Jalur Reguler"]
+    )
+
+    kelas = st.selectbox(
+        "🎫 Pilih Kelas",
+        ["Ekonomi", "Bisnis", "Eksekutif"]
+    )
+
+    jumlah = st.number_input(
+        "🎟️ Jumlah Tiket",
+        min_value=1,
+        value=1
+    )
+
+    jadwal = st.selectbox(
+        "🕒 Pilih Jadwal",
+        ["08:00 WIB", "12:00 WIB", "18:00 WIB"]
+    )
+
+    kursi = st.text_input(
+        "🪑 Nomor Kursi",
+        value="A1"
+    )
+
+    # =========================
+    # PEMBAYARAN E-WALLET / TRANSFER
+    # =========================
+    metode = st.selectbox(
+        "💳 Metode Pembayaran",
+        [
+            "DANA",
+            "OVO",
+            "GoPay",
+            "ShopeePay",
+            "Transfer BCA",
+            "Transfer BRI",
+            "Transfer BNI",
+            "Transfer Mandiri"
+        ]
+    )
+
+    nomor_ewallet = st.text_input("📱 Nomor / ID Pembayaran")
+
+    if st.button("💳 Bayar Sekarang"):
+
+        if not nomor_ewallet:
+            st.error("❌ Masukkan nomor e-wallet / rekening terlebih dahulu!")
+        else:
+
+            rute, jarak = kereta.dijkstra(asal, tujuan)
 
             if kelas == "Ekonomi":
-                harga = d * 1000
+                harga_per_km = 1000
             elif kelas == "Bisnis":
-                harga = d * 1500
+                harga_per_km = 1500
             else:
-                harga = d * 2000
+                harga_per_km = 2000
 
-            total = harga * jumlah
+            total = jarak * harga_per_km * jumlah
             kode = random.randint(10000, 99999)
 
             st.session_state.riwayat.append({
                 "nama": st.session_state.nama,
-                "asal": a,
-                "tujuan": b,
+                "asal": asal,
+                "tujuan": tujuan,
+                "jalur": jalur,
                 "kelas": kelas,
+                "jumlah": jumlah,
+                "jadwal": jadwal,
+                "kursi": kursi,
+                "pembayaran": metode,
+                "nomor": nomor_ewallet,
                 "harga": total
             })
 
-            st.success("Pembayaran berhasil!")
+            st.success("✅ Pembayaran Berhasil!")
+
             st.code(f"""
-Kode: {kode}
-Rute: {' → '.join(r)}
-Total: Rp{total:,}
+══════════════════════════════
+      🎫 E-TIKET KERETA
+══════════════════════════════
+
+🎟️ Kode Tiket : {kode}
+👤 Nama       : {st.session_state.nama}
+🚉 Dari       : {asal}
+🚉 Tujuan     : {tujuan}
+⚡ Jalur      : {jalur}
+🚆 Rute       : {' → '.join(rute)}
+🎫 Kelas      : {kelas}
+🎟️ Jumlah     : {jumlah}
+🪑 Kursi      : {kursi}
+🕒 Jadwal     : {jadwal}
+💳 Metode     : {metode}
+📱 ID         : {nomor_ewallet}
+💵 Total      : Rp{total:,}
+
+══════════════════════════════
+Selamat Menikmati Perjalanan 🚄
+══════════════════════════════
 """)
 
 
