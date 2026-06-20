@@ -2,15 +2,18 @@ import streamlit as st
 import heapq
 import random
 
+# ==========================================
+# CONFIG
+# ==========================================
 st.set_page_config(
     page_title="Stasiun VY Junction",
     page_icon="🚆",
     layout="wide"
 )
 
-# =========================
-# CLASS LOGIN
-# =========================
+# ==========================================
+# LOGIN CLASS
+# ==========================================
 class Login:
     def __init__(self, nama, no_hp, email):
         self.nama = nama
@@ -18,19 +21,34 @@ class Login:
         self.email = email
 
 
-# =========================
-# GRAPH
-# =========================
+# ==========================================
+# GRAPH KERETA
+# ==========================================
 class GraphKereta:
     def __init__(self):
         self.graf = {
-            "Jakarta": [("Bandung", 150), ("Bekasi", 35), ("Bogor", 60)],
-            "Bandung": [("Jakarta", 150), ("Cimahi", 20), ("Yogyakarta", 390)],
-            "Bekasi": [("Jakarta", 35), ("Karawang", 45)],
-            "Bogor": [("Jakarta", 60)],
+            "Jakarta": [("Bandung", 150), ("Bekasi", 35), ("Bogor", 60), ("Cirebon", 220)],
+            "Bekasi": [("Jakarta", 35), ("Karawang", 45), ("Depok", 30)],
+            "Depok": [("Bekasi", 30), ("Bogor", 40)],
+            "Bogor": [("Jakarta", 60), ("Sukabumi", 90), ("Depok", 40)],
+            "Sukabumi": [("Bogor", 90), ("Bandung", 100)],
+            "Bandung": [("Jakarta", 150), ("Tasikmalaya", 110), ("Garut", 70), ("Cimahi", 20), ("Yogyakarta", 390)],
             "Cimahi": [("Bandung", 20)],
-            "Karawang": [("Bekasi", 45)],
-            "Yogyakarta": [("Bandung", 390)]
+            "Garut": [("Bandung", 70), ("Tasikmalaya", 60)],
+            "Tasikmalaya": [("Bandung", 110), ("Banjar", 80)],
+            "Banjar": [("Tasikmalaya", 80), ("Yogyakarta", 200)],
+            "Karawang": [("Bekasi", 45), ("Cirebon", 140)],
+            "Cirebon": [("Jakarta", 220), ("Karawang", 140), ("Purwokerto", 170), ("Semarang", 250)],
+            "Purwokerto": [("Cirebon", 170), ("Yogyakarta", 180)],
+            "Semarang": [("Cirebon", 250), ("Solo", 110), ("Surabaya", 350)],
+            "Solo": [("Semarang", 110), ("Yogyakarta", 65), ("Madiun", 100)],
+            "Madiun": [("Solo", 100), ("Kediri", 120)],
+            "Kediri": [("Madiun", 120), ("Malang", 130)],
+            "Yogyakarta": [("Bandung", 390), ("Solo", 65), ("Purwokerto", 180), ("Banjar", 200), ("Surabaya", 320)],
+            "Surabaya": [("Semarang", 350), ("Yogyakarta", 320), ("Malang", 95), ("Jember", 200)],
+            "Malang": [("Surabaya", 95), ("Kediri", 130)],
+            "Jember": [("Surabaya", 200), ("Banyuwangi", 100)],
+            "Banyuwangi": [("Jember", 100)]
         }
 
     def dijkstra(self, start, end):
@@ -64,9 +82,9 @@ class GraphKereta:
 
 kereta = GraphKereta()
 
-# =========================
+# ==========================================
 # SESSION STATE
-# =========================
+# ==========================================
 if "login" not in st.session_state:
     st.session_state.login = False
 if "role" not in st.session_state:
@@ -79,9 +97,9 @@ if "logout_confirm" not in st.session_state:
     st.session_state.logout_confirm = False
 
 
-# =========================
-# LOGIN PAGE (FIX)
-# =========================
+# ==========================================
+# LOGIN PAGE
+# ==========================================
 if not st.session_state.login:
 
     st.title("🚆 LOGIN VY JUNCTION")
@@ -95,43 +113,39 @@ if not st.session_state.login:
     if st.button("Login"):
 
         if role == "Admin":
-
             if nama == "admin" and email == "admin@gmail.com":
                 st.session_state.login = True
                 st.session_state.role = "admin"
                 st.session_state.nama = "Admin"
                 st.rerun()
-
             else:
                 st.error("Login admin salah!")
 
         else:
-
             if nama and no_hp and email:
                 st.session_state.login = True
                 st.session_state.role = "user"
                 st.session_state.nama = nama
                 st.rerun()
-
             else:
                 st.error("Isi semua data!")
 
-# =========================
+
+# ==========================================
 # APP
-# =========================
+# ==========================================
 else:
 
     st.title("🚆 VY JUNCTION")
     st.success(f"Welcome {st.session_state.nama}")
 
-    # =========================
-    # LOGOUT CONFIRM
-    # =========================
+    # ==========================================
+    # LOGOUT
+    # ==========================================
     if st.sidebar.button("Logout 🚪"):
         st.session_state.logout_confirm = True
 
     if st.session_state.logout_confirm:
-
         st.warning("Yakin mau logout?")
 
         c1, c2 = st.columns(2)
@@ -148,94 +162,149 @@ else:
                 st.session_state.logout_confirm = False
                 st.rerun()
 
-    # =========================
-    # MENU
-    # =========================
+
+    # ==========================================
+    # MENU USER
+    # ==========================================
     st.sidebar.title("MENU")
 
     if st.session_state.role == "user":
-
-        if st.sidebar.button("Cari Rute"):
+        if st.sidebar.button("🗺️ Rute"):
             st.session_state.menu = "rute"
-        if st.sidebar.button("Beli Tiket"):
+        if st.sidebar.button("⚡ Tercepat"):
+            st.session_state.menu = "tercepat"
+        if st.sidebar.button("🎫 Beli Tiket"):
             st.session_state.menu = "beli"
-        if st.sidebar.button("Riwayat"):
+        if st.sidebar.button("📜 Riwayat"):
+            st.session_state.menu = "riwayat"
+        if st.sidebar.button("🌐 Graph"):
+            st.session_state.menu = "graph"
+
+
+    # ==========================================
+    # MENU ADMIN
+    # ==========================================
+    if st.session_state.role == "admin":
+        if st.sidebar.button("📊 Dashboard"):
+            st.session_state.menu = "dashboard"
+        if st.sidebar.button("🚉 Kelola Stasiun"):
+            st.session_state.menu = "stasiun"
+        if st.sidebar.button("🔗 Kelola Jalur"):
+            st.session_state.menu = "jalur"
+        if st.sidebar.button("📜 Riwayat Tiket"):
             st.session_state.menu = "riwayat"
 
-    if st.session_state.role == "admin":
 
-        if st.sidebar.button("Dashboard"):
-            st.session_state.menu = "dashboard"
-        if st.sidebar.button("Kelola Stasiun"):
-            st.session_state.menu = "stasiun"
-        if st.sidebar.button("Kelola Jalur"):
-            st.session_state.menu = "jalur"
-        if st.sidebar.button("Tiket"):
-            st.session_state.menu = "tiket"
-        if st.sidebar.button("Laporan"):
-            st.session_state.menu = "laporan"
-
-
-    # =========================
-    # RUTE USER
-    # =========================
+    # ==========================================
+    # RUTE
+    # ==========================================
     if st.session_state.menu == "rute":
+
+        st.subheader("🗺️ Cari Rute")
 
         a = st.selectbox("Dari", list(kereta.graf.keys()))
         b = st.selectbox("Ke", list(kereta.graf.keys()))
 
         if st.button("Cari"):
             r, d = kereta.dijkstra(a, b)
-            st.info(f"{' -> '.join(r)} | {d} KM")
+            st.info(f"{' → '.join(r)} | {d} KM")
 
 
-    # =========================
+    # ==========================================
+    # TERCEPAT
+    # ==========================================
+    elif st.session_state.menu == "tercepat":
+
+        st.subheader("⚡ Jalur Tercepat")
+
+        a = st.selectbox("Dari", list(kereta.graf.keys()), key="a")
+        b = st.selectbox("Ke", list(kereta.graf.keys()), key="b")
+
+        if st.button("Cari Cepat"):
+            r, d = kereta.dijkstra(a, b)
+            st.success(f"Jalur: {' → '.join(r)}")
+            st.info(f"Jarak: {d} KM | Estimasi: {d//2} menit")
+
+
+    # ==========================================
     # BELI TIKET
-    # =========================
+    # ==========================================
     elif st.session_state.menu == "beli":
+
+        st.subheader("🎫 Beli Tiket")
 
         a = st.selectbox("Dari", list(kereta.graf.keys()))
         b = st.selectbox("Ke", list(kereta.graf.keys()))
+        kelas = st.selectbox("Kelas", ["Ekonomi", "Bisnis", "Eksekutif"])
+        jumlah = st.number_input("Jumlah", 1)
 
         if st.button("Bayar"):
 
             r, d = kereta.dijkstra(a, b)
-            total = d * 1000
+
+            if kelas == "Ekonomi":
+                harga = d * 1000
+            elif kelas == "Bisnis":
+                harga = d * 1500
+            else:
+                harga = d * 2000
+
+            total = harga * jumlah
+            kode = random.randint(10000, 99999)
 
             st.session_state.riwayat.append({
                 "nama": st.session_state.nama,
                 "asal": a,
                 "tujuan": b,
+                "kelas": kelas,
                 "harga": total
             })
 
-            st.success(f"Tiket berhasil Rp{total}")
+            st.success("Pembayaran berhasil!")
+            st.code(f"""
+Kode: {kode}
+Rute: {' → '.join(r)}
+Total: Rp{total:,}
+""")
 
 
-    # =========================
+    # ==========================================
     # RIWAYAT
-    # =========================
+    # ==========================================
     elif st.session_state.menu == "riwayat":
+
+        st.subheader("📜 Riwayat")
 
         for t in st.session_state.riwayat:
             st.write(t)
 
 
-    # =========================
+    # ==========================================
+    # GRAPH
+    # ==========================================
+    elif st.session_state.menu == "graph":
+
+        st.subheader("🌐 Graph Rute")
+
+        for s in kereta.graf:
+            st.write(f"{s} → {kereta.graf[s]}")
+
+
+    # ==========================================
     # DASHBOARD ADMIN
-    # =========================
+    # ==========================================
     elif st.session_state.menu == "dashboard":
 
         st.metric("Total Tiket", len(st.session_state.riwayat))
-        st.metric("Total Pendapatan", sum(t["harga"] for t in st.session_state.riwayat))
+        st.metric("Pendapatan", sum(t["harga"] for t in st.session_state.riwayat))
 
 
-    # =========================
-    # KELOLA STASIUN
-    # =========================
+    # ==========================================
+    # STASIUN ADMIN
+    # ==========================================
     elif st.session_state.menu == "stasiun":
 
-        nama = st.text_input("Stasiun baru")
+        nama = st.text_input("Tambah Stasiun Baru")
 
         if st.button("Tambah"):
             if nama:
@@ -245,33 +314,16 @@ else:
         st.write(list(kereta.graf.keys()))
 
 
-    # =========================
-    # KELOLA JALUR
-    # =========================
+    # ==========================================
+    # JALUR ADMIN
+    # ==========================================
     elif st.session_state.menu == "jalur":
 
         a = st.selectbox("Dari", list(kereta.graf.keys()))
         b = st.selectbox("Ke", list(kereta.graf.keys()))
-        j = st.number_input("Jarak", 1)
+        jarak = st.number_input("Jarak", 1)
 
         if st.button("Tambah"):
-            kereta.graf[a].append((b, j))
-            kereta.graf[b].append((a, j))
+            kereta.graf[a].append((b, jarak))
+            kereta.graf[b].append((a, jarak))
             st.success("Jalur ditambah")
-
-
-    # =========================
-    # TIKET ADMIN
-    # =========================
-    elif st.session_state.menu == "tiket":
-
-        for t in st.session_state.riwayat:
-            st.write(t)
-
-
-    # =========================
-    # LAPORAN
-    # =========================
-    elif st.session_state.menu == "laporan":
-
-        st.write("Total:", sum(t["harga"] for t in st.session_state.riwayat))
