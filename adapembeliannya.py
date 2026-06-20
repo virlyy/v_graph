@@ -229,9 +229,8 @@ else:
    # ==========================================
 # BELI TIKET (VERSI E-WALLET + TRANSFER)
 # ==========================================
-elif st.session_state.menu == "beli":
-
-    st.subheader("🎫 Pembelian Tiket")
+    elif st.session_state.menu == "beli":
+        st.subheader("🎫 Pembelian Tiket")
 
     col1, col2 = st.columns(2)
 
