@@ -9,7 +9,7 @@ st.set_page_config(
 )
 
 # =========================
-# LOGIN CLASS
+# CLASS LOGIN
 # =========================
 class Login:
     def __init__(self, nama, no_hp, email):
@@ -25,7 +25,7 @@ class GraphKereta:
     def __init__(self):
         self.graf = {
             "Jakarta": [("Bandung", 150), ("Bekasi", 35), ("Bogor", 60)],
-            "Bandung": [("Jakarta", 150), ("Yogyakarta", 390), ("Cimahi", 20)],
+            "Bandung": [("Jakarta", 150), ("Cimahi", 20), ("Yogyakarta", 390)],
             "Bekasi": [("Jakarta", 35), ("Karawang", 45)],
             "Bogor": [("Jakarta", 60)],
             "Cimahi": [("Bandung", 20)],
@@ -67,23 +67,26 @@ kereta = GraphKereta()
 # =========================
 # SESSION STATE
 # =========================
-for key, val in {
-    "login": False,
-    "role": "",
-    "menu": "rute",
-    "riwayat": [],
-    "logout_confirm": False
-}.items():
-    if key not in st.session_state:
-        st.session_state[key] = val
+if "login" not in st.session_state:
+    st.session_state.login = False
+if "role" not in st.session_state:
+    st.session_state.role = ""
+if "menu" not in st.session_state:
+    st.session_state.menu = "rute"
+if "riwayat" not in st.session_state:
+    st.session_state.riwayat = []
+if "logout_confirm" not in st.session_state:
+    st.session_state.logout_confirm = False
 
 
 # =========================
-# LOGIN
+# LOGIN PAGE (FIX)
 # =========================
 if not st.session_state.login:
 
     st.title("🚆 LOGIN VY JUNCTION")
+
+    role = st.radio("Login sebagai:", ["User", "Admin"])
 
     nama = st.text_input("Nama")
     no_hp = st.text_input("No HP")
@@ -91,20 +94,27 @@ if not st.session_state.login:
 
     if st.button("Login"):
 
-        if nama == "admin" and email == "admin@gmail.com":
-            st.session_state.login = True
-            st.session_state.role = "admin"
-            st.session_state.nama = "Admin"
-            st.rerun()
+        if role == "Admin":
 
-        elif nama and no_hp and email:
-            st.session_state.login = True
-            st.session_state.role = "user"
-            st.session_state.nama = nama
-            st.rerun()
+            if nama == "admin" and email == "admin@gmail.com":
+                st.session_state.login = True
+                st.session_state.role = "admin"
+                st.session_state.nama = "Admin"
+                st.rerun()
+
+            else:
+                st.error("Login admin salah!")
 
         else:
-            st.error("Isi semua data!")
+
+            if nama and no_hp and email:
+                st.session_state.login = True
+                st.session_state.role = "user"
+                st.session_state.nama = nama
+                st.rerun()
+
+            else:
+                st.error("Isi semua data!")
 
 # =========================
 # APP
@@ -112,7 +122,6 @@ if not st.session_state.login:
 else:
 
     st.title("🚆 VY JUNCTION")
-
     st.success(f"Welcome {st.session_state.nama}")
 
     # =========================
@@ -128,7 +137,7 @@ else:
         c1, c2 = st.columns(2)
 
         with c1:
-            if st.button("Ya, Logout"):
+            if st.button("Ya"):
                 st.session_state.login = False
                 st.session_state.role = ""
                 st.session_state.logout_confirm = False
@@ -139,44 +148,36 @@ else:
                 st.session_state.logout_confirm = False
                 st.rerun()
 
+    # =========================
+    # MENU
+    # =========================
     st.sidebar.title("MENU")
 
-    # =========================
-    # USER MENU
-    # =========================
     if st.session_state.role == "user":
 
         if st.sidebar.button("Cari Rute"):
             st.session_state.menu = "rute"
-
         if st.sidebar.button("Beli Tiket"):
             st.session_state.menu = "beli"
-
         if st.sidebar.button("Riwayat"):
             st.session_state.menu = "riwayat"
 
-    # =========================
-    # ADMIN MENU
-    # =========================
     if st.session_state.role == "admin":
 
         if st.sidebar.button("Dashboard"):
             st.session_state.menu = "dashboard"
-
         if st.sidebar.button("Kelola Stasiun"):
             st.session_state.menu = "stasiun"
-
         if st.sidebar.button("Kelola Jalur"):
             st.session_state.menu = "jalur"
-
         if st.sidebar.button("Tiket"):
             st.session_state.menu = "tiket"
-
         if st.sidebar.button("Laporan"):
             st.session_state.menu = "laporan"
 
+
     # =========================
-    # RUTE
+    # RUTE USER
     # =========================
     if st.session_state.menu == "rute":
 
@@ -187,8 +188,9 @@ else:
             r, d = kereta.dijkstra(a, b)
             st.info(f"{' -> '.join(r)} | {d} KM")
 
+
     # =========================
-    # BELI
+    # BELI TIKET
     # =========================
     elif st.session_state.menu == "beli":
 
@@ -209,6 +211,7 @@ else:
 
             st.success(f"Tiket berhasil Rp{total}")
 
+
     # =========================
     # RIWAYAT
     # =========================
@@ -217,28 +220,33 @@ else:
         for t in st.session_state.riwayat:
             st.write(t)
 
+
     # =========================
     # DASHBOARD ADMIN
     # =========================
     elif st.session_state.menu == "dashboard":
 
         st.metric("Total Tiket", len(st.session_state.riwayat))
+        st.metric("Total Pendapatan", sum(t["harga"] for t in st.session_state.riwayat))
+
 
     # =========================
-    # STASIUN
+    # KELOLA STASIUN
     # =========================
     elif st.session_state.menu == "stasiun":
 
         nama = st.text_input("Stasiun baru")
 
         if st.button("Tambah"):
-            kereta.graf[nama] = []
-            st.success("Ditambah")
+            if nama:
+                kereta.graf[nama] = []
+                st.success("Stasiun ditambah")
 
         st.write(list(kereta.graf.keys()))
 
+
     # =========================
-    # JALUR
+    # KELOLA JALUR
     # =========================
     elif st.session_state.menu == "jalur":
 
@@ -251,6 +259,7 @@ else:
             kereta.graf[b].append((a, j))
             st.success("Jalur ditambah")
 
+
     # =========================
     # TIKET ADMIN
     # =========================
@@ -259,9 +268,10 @@ else:
         for t in st.session_state.riwayat:
             st.write(t)
 
+
     # =========================
     # LAPORAN
     # =========================
     elif st.session_state.menu == "laporan":
 
-        st.write("Total pendapatan:", sum(t["harga"] for t in st.session_state.riwayat))
+        st.write("Total:", sum(t["harga"] for t in st.session_state.riwayat))
