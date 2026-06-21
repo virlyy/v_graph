@@ -814,50 +814,109 @@ Rp{total:,}
     # ==========================================
     elif st.session_state.menu == "jalur":
 
-        st.subheader(
-            "🔗 Kelola Jalur"
-        )
+        st.subheader("🔗 Kelola Jalur")
 
-        asal = st.selectbox(
-            "Dari",
-            list(
-                kereta.graf.keys()
-            )
-        )
+        stasiun_list = list(kereta.graf.keys())
 
-        tujuan = st.selectbox(
-            "Ke",
-            list(
-                kereta.graf.keys()
-            )
-        )
+        # =========================
+        # TAMBAH JALUR
+        # =========================
+        st.write("### ➕ Tambah Jalur")
 
-        jarak = st.number_input(
-            "Jarak (KM)",
-            min_value=1
-        )
+        asal = st.selectbox("Dari", stasiun_list, key="asal")
+        tujuan = st.selectbox("Ke", stasiun_list, key="tujuan")
+        jarak = st.number_input("Jarak (KM)", min_value=1)
 
-        if st.button(
-            "Tambah Jalur"
-        ):
+        if st.button("Tambah Jalur"):
 
-            kereta.graf[asal].append(
-                (
-                    tujuan,
-                    jarak
-                )
-            )
+            if asal != tujuan:
 
-            kereta.graf[tujuan].append(
-                (
-                    asal,
-                    jarak
-                )
-            )
+                kereta.graf[asal].append((tujuan, jarak))
+                kereta.graf[tujuan].append((asal, jarak))
 
-            st.success(
-                "Jalur berhasil ditambahkan"
-            )
+                st.success("Jalur berhasil ditambahkan")
+
+            else:
+                st.warning("Stasiun asal dan tujuan tidak boleh sama")
+
+        st.divider()
+
+        # =========================
+        # EDIT JALUR
+        # =========================
+        st.write("### ✏️ Edit Jalur")
+
+        asal_edit = st.selectbox("Pilih dari stasiun", stasiun_list, key="asal_edit")
+
+        if kereta.graf[asal_edit]:
+
+            jalur_list = [
+                f"{asal_edit} -> {tujuan} ({jarak} KM)"
+                for tujuan, jarak in kereta.graf[asal_edit]
+            ]
+
+            jalur_pilih = st.selectbox("Pilih jalur", jalur_list)
+
+            tujuan_lama, jarak_lama = kereta.graf[asal_edit][jalur_list.index(jalur_pilih)]
+
+            tujuan_baru = st.selectbox("Tujuan baru", stasiun_list, key="tujuan_baru")
+            jarak_baru = st.number_input("Jarak baru", min_value=1, value=jarak_lama)
+
+            if st.button("Update Jalur"):
+
+                # hapus jalur lama (dua arah)
+                kereta.graf[asal_edit].remove((tujuan_lama, jarak_lama))
+                kereta.graf[tujuan_lama].remove((asal_edit, jarak_lama))
+
+                # tambah jalur baru
+                kereta.graf[asal_edit].append((tujuan_baru, jarak_baru))
+                kereta.graf[tujuan_baru].append((asal_edit, jarak_baru))
+
+                st.success("Jalur berhasil diupdate")
+
+        else:
+            st.info("Tidak ada jalur dari stasiun ini")
+
+        st.divider()
+
+        # =========================
+        # HAPUS JALUR
+        # =========================
+        st.write("### 🗑️ Hapus Jalur")
+
+        asal_hapus = st.selectbox("Pilih dari stasiun", stasiun_list, key="asal_hapus")
+
+        if kereta.graf[asal_hapus]:
+
+            jalur_list_hapus = [
+                f"{asal_hapus} -> {tujuan} ({jarak} KM)"
+                for tujuan, jarak in kereta.graf[asal_hapus]
+            ]
+
+            jalur_hapus = st.selectbox("Pilih jalur yang mau dihapus", jalur_list_hapus)
+
+            tujuan_del, jarak_del = kereta.graf[asal_hapus][jalur_list_hapus.index(jalur_hapus)]
+
+            if st.button("Hapus Jalur"):
+
+                kereta.graf[asal_hapus].remove((tujuan_del, jarak_del))
+                kereta.graf[tujuan_del].remove((asal_hapus, jarak_del))
+
+                st.success("Jalur berhasil dihapus")
+
+        else:
+            st.info("Tidak ada jalur dari stasiun ini")
+
+        st.divider()
+
+        # =========================
+        # TAMPILKAN JALUR
+        # =========================
+        st.write("### 📍 Semua Jalur")
+
+        for asal in kereta.graf:
+            for tujuan, jarak in kereta.graf[asal]:
+                st.write(f"{asal} → {tujuan} ({jarak} KM)")
 
     # ==========================================
     # DATA TIKET ADMIN
