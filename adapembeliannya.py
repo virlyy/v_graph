@@ -439,7 +439,7 @@ else:
             estimasi = total_jarak // 2
 
             st.success("Jalur tercepat ditemukan")
-                        st.info(f"""
+            st.info(f"""
 🚉 Dari          : {mulai}
 
 🚉 Tujuan        : {tujuan}
