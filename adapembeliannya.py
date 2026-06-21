@@ -741,31 +741,74 @@ Rp{total:,}
         st.subheader(
             "🚉 Kelola Stasiun"
         )
+    # ==========================================
+    # TAMBAH STASIUN
+    # ==========================================
+        nama_baru = st.text_input("Nama Stasiun Baru")
 
-        nama_baru = st.text_input(
-            "Nama Stasiun Baru"
-        )
-
-        if st.button(
-            "Tambah Stasiun"
-        ):
+        if st.button("Tambah Stasiun"):
 
             if nama_baru:
 
-                kereta.graf[
-                    nama_baru
-                ] = []
+                if nama_baru not in kereta.graf:
 
-                st.success(
-                    "Stasiun berhasil ditambah"
-                )
+                    kereta.graf[nama_baru] = []
+                    st.success("Stasiun berhasil ditambah")
 
-        st.write(
-            list(
-                kereta.graf.keys()
+                else:
+                    st.warning("Stasiun sudah ada")
+
+        st.divider()
+    # ==========================================
+    # EDIT STASIUN
+    # ==========================================
+        st.write("### ✏️ Edit Stasiun")
+
+        daftar_stasiun = list(kereta.graf.keys())
+
+        if daftar_stasiun:
+
+            stasiun_lama = st.selectbox(
+                "Pilih stasiun yang mau diedit",
+                daftar_stasiun
             )
-        )
 
+            nama_baru_edit = st.text_input("Nama baru stasiun")
+
+            if st.button("Update Nama Stasiun"):
+
+                if nama_baru_edit:
+
+                    kereta.graf[nama_baru_edit] = kereta.graf.pop(stasiun_lama)
+                    st.success("Nama stasiun berhasil diubah")
+
+        st.divider()
+    # ==========================================
+    # HAPUS STASIUN
+    # ==========================================
+        st.write("### 🗑️ Hapus Stasiun")
+
+        if daftar_stasiun:
+
+            stasiun_hapus = st.selectbox(
+                "Pilih stasiun yang mau dihapus",
+                daftar_stasiun,
+                key="hapus"
+            )
+
+            if st.button("Hapus Stasiun"):
+
+                del kereta.graf[stasiun_hapus]
+                st.success("Stasiun berhasil dihapus")
+
+        st.divider()
+
+        # =========================
+        # TAMPILKAN
+        # =========================
+        st.write("### 📍 Daftar Stasiun")
+
+        st.write(list(kereta.graf.keys()))
     # ==========================================
     # KELOLA JALUR
     # ==========================================
